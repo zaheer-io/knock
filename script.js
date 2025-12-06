@@ -69,17 +69,20 @@ document.addEventListener('mousemove', (e) => {
 });
 
 function animateOrbs() {
-    orbs.forEach((orb, index) => {
-        const rect = orb.getBoundingClientRect();
-        const orbX = rect.left + rect.width / 2;
-        const orbY = rect.top + rect.height / 2;
+    // Disable orb tracking on mobile for better performance
+    if (window.innerWidth > 768) {
+        orbs.forEach((orb, index) => {
+            const rect = orb.getBoundingClientRect();
+            const orbX = rect.left + rect.width / 2;
+            const orbY = rect.top + rect.height / 2;
 
-        const deltaX = (mouseX - orbX) * 0.02;
-        const deltaY = (mouseY - orbY) * 0.02;
+            const deltaX = (mouseX - orbX) * 0.02;
+            const deltaY = (mouseY - orbY) * 0.02;
 
-        const currentTransform = orb.style.transform || '';
-        orb.style.transform = `${currentTransform} translate(${deltaX}px, ${deltaY}px)`;
-    });
+            const currentTransform = orb.style.transform || '';
+            orb.style.transform = `${currentTransform} translate(${deltaX}px, ${deltaY}px)`;
+        });
+    }
 
     requestAnimationFrame(animateOrbs);
 }
@@ -179,20 +182,25 @@ if (demoContainer) {
 }
 
 // ==================== PARALLAX EFFECT ====================
+const isMobile = window.innerWidth <= 768;
+
 window.addEventListener('scroll', () => {
     const scrolled = window.pageYOffset;
     const heroContent = document.querySelector('.hero-content');
 
-    if (heroContent) {
+    // Only apply parallax on desktop for better performance
+    if (heroContent && !isMobile) {
         heroContent.style.transform = `translateY(${scrolled * 0.3}px)`;
         heroContent.style.opacity = 1 - scrolled / 600;
     }
 
-    // Parallax for orbs
-    orbs.forEach((orb, index) => {
-        const speed = 0.05 + (index * 0.02);
-        orb.style.transform = `translateY(${scrolled * speed}px)`;
-    });
+    // Parallax for orbs (disabled on mobile)
+    if (!isMobile) {
+        orbs.forEach((orb, index) => {
+            const speed = 0.05 + (index * 0.02);
+            orb.style.transform = `translateY(${scrolled * speed}px)`;
+        });
+    }
 });
 
 // ==================== BATTLE TIMER ANIMATION ====================
